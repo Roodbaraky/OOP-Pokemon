@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokeball, Pokemon, Rattata, Squirtle, WaterType } from './pokemon';
+import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokeball, Pokemon, Rattata, Squirtle, Trainer, WaterType, PokeballProps } from './pokemon';
 
 describe('Pokemon Class', () => {
     let pikachu: Pokemon;
@@ -319,7 +319,7 @@ describe('Pokeball Class', () => {
             pokeball.throw(bulbasaur)
             expect(pokeball.contains()).toBe('Bulbasaur')
         })
-        it('should return \'Pokeball is empty!\' if no pokemon is stored',()=>{
+        it('should return \'Pokeball is empty!\' if no pokemon is stored', () => {
             expect(pokeball.contains()).toBe('The pokeball is empty!')
         })
     })
@@ -354,5 +354,66 @@ describe('Pokeball Class', () => {
         console.log = jest.fn();
         pokeball.throw(bulbasaur);
         expect(console.log).toHaveBeenCalledWith('Captured Bulbasaur!');
+    });
+});
+
+describe('Trainer Class', () => {
+    let trainer: Trainer;
+    let squirtle: Squirtle;
+    let bulbasaur: Bulbasaur;
+    let pikachu: Pikachu;
+
+    beforeEach(() => {
+        trainer = new Trainer('Ash');
+        squirtle = new Squirtle('Squirtle');
+        bulbasaur = new Bulbasaur('Bulbasaur');
+        pikachu = new Pikachu('Pikachu');
+    });
+
+    test('should catch a Pokémon into an empty Pokéball', () => {
+        console.log = jest.fn();
+        trainer.catch(squirtle);
+        const firstPokeball = trainer.belt[0];
+        expect(firstPokeball.storedPokemon).toBe(squirtle);
+        expect(console.log).toHaveBeenCalledWith(`Captured ${squirtle.name}!`);
+    });
+
+    test('should not catch a Pokémon if no empty Pokéballs are available', () => {
+        console.log = jest.fn();
+        trainer.belt.forEach(pokeball => pokeball.throw(squirtle));
+        trainer.catch(bulbasaur);
+        expect(console.log).toHaveBeenCalledWith('No empty pokeballs!');
+    });
+
+    test('should retrieve and throw a stored Pokémon', () => {
+        trainer.catch(squirtle);
+        console.log = jest.fn();
+        trainer.getPokemon(squirtle);
+        expect(console.log).toHaveBeenCalledWith(`Go ${squirtle.name}`);
+    });
+
+    test('should not retrieve a Pokémon that is not stored', () => {
+        console.log = jest.fn();
+        trainer.getPokemon(bulbasaur);
+        expect(console.log).toHaveBeenCalledWith('You don\'t have that pokemon!');
+    });
+
+    test('should store and retrieve multiple Pokémon', () => {
+        trainer.catch(squirtle);
+        trainer.catch(bulbasaur);
+        trainer.catch(pikachu);
+        console.log(trainer.belt)
+        expect(trainer.belt[0].storedPokemon).toBe(squirtle);
+        expect(trainer.belt[1].storedPokemon).toBe(bulbasaur);
+        expect(trainer.belt[2].storedPokemon).toBe(pikachu);
+
+        console.log = jest.fn();
+        trainer.getPokemon(squirtle);
+        trainer.getPokemon(bulbasaur);
+        trainer.getPokemon(pikachu);
+
+        expect(console.log).toHaveBeenCalledWith(`Go ${squirtle.name}`);
+        expect(console.log).toHaveBeenCalledWith(`Go ${bulbasaur.name}`);
+        expect(console.log).toHaveBeenCalledWith(`Go ${pikachu.name}`);
     });
 });

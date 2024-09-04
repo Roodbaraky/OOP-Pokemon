@@ -38,7 +38,9 @@ export class Pokemon {
         return TypeEffectiveness[this.type]?.weakTo === pokemon.type;
     }
 }
-
+export interface PokeballProps {
+    storedPokemon?: Pokemon
+}
 export class Pokeball {
     storedPokemon?: Pokemon;
     constructor() {
@@ -47,10 +49,10 @@ export class Pokeball {
     isEmpty() {
         return this.storedPokemon === undefined
     }
-    contains(){
+    contains() {
         return this.isEmpty()
-        ?`The pokeball is empty!`
-        :this.storedPokemon?.name
+            ? `The pokeball is empty!`
+            : this.storedPokemon?.name
     }
     throw(pokemon?: Pokemon) {
         if (pokemon && this.isEmpty()) {
@@ -62,11 +64,34 @@ export class Pokeball {
         }
         else {
             console.log(`${this.isEmpty()
-                ?this.contains()
-            :'This pokeball already contains '+ this.contains()+'!'}`)
+                ? this.contains()
+                : 'This pokeball already contains ' + this.contains() + '!'}`)
         }
     }
+}
 
+export class Trainer {
+    name: string
+    belt: Pokeball[]
+    constructor(name: string) {
+        this.name = name
+        this.belt = Array.from({ length: 6 }, () => new Pokeball())
+    }
+    catch(pokemon: Pokemon) {
+        const emptyPokeballs = this.belt.filter((pokeball: Pokeball) => pokeball.isEmpty())
+        console.log(emptyPokeballs)
+        if (!emptyPokeballs.length) {
+            console.log('No empty pokeballs!')
+        }
+        else {
+            emptyPokeballs[0].throw(pokemon)
+        }
+    }
+    getPokemon(pokemon: Pokemon) {
+        const foundPokemon = this.belt.find((pokeball) => pokeball.contains() === pokemon.name)
+        if (!foundPokemon) console.log('You don\'t have that pokemon!')
+        else foundPokemon.throw()
+    }
 }
 
 
