@@ -3,7 +3,9 @@ export class Pokemon {
     hitPoints: number;
     attackDamage: number;
     move: string;
-    constructor(name) {
+    type: string;
+    constructor(name: string) {
+        this.type = 'normal'
         this.name = name;
         this.hitPoints = 100;
         this.attackDamage = 45;
@@ -12,13 +14,22 @@ export class Pokemon {
     takeDamage(damageAmount: number) {
         this.hitPoints -= damageAmount
     };
-    useMove(move: string) {
+    useMove() {
         console.log(`${this.name} used ${this.name}'s move: ${this.move}`)
-
     }
     hasFainted() {
         return this.hitPoints <= 0
             ? true
             : false
+    }
+}
+
+export class FireType extends Pokemon {
+    constructor(name: string) {
+        super(name)
+        this.type = 'fire';
+    }
+    isEffectiveAgainst(pokemon: Pokemon) {
+        return pokemon.type === 'grass'
     }
 }

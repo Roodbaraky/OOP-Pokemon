@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { Pokemon } from './pokemon';
+import { FireType, Pokemon } from './pokemon';
 
 describe('Pokemon Class', () => {
     let pikachu: Pokemon;
@@ -35,8 +35,51 @@ describe('Pokemon Class', () => {
 
     it('should correctly use a move', () => {
         const consoleSpy = jest.spyOn(console, 'log');
-        pikachu.useMove('tackle');
+        pikachu.useMove();
         expect(consoleSpy).toHaveBeenCalledWith("Pikachu used Pikachu's move: tackle");
         consoleSpy.mockRestore();
+    });
+});
+
+describe('FireType Class', () => {
+    let charmander: FireType;
+    let bulbasaur: Pokemon;
+    let squirtle: Pokemon;
+
+    beforeEach(() => {
+        charmander = new FireType('Charmander');
+        bulbasaur = new Pokemon('Bulbasaur');
+        bulbasaur.type = 'grass';
+        squirtle = new Pokemon('Squirtle');
+        squirtle.type = 'water';
+    });
+
+    test('should create a FireType Pokemon with the correct default properties', () => {
+        expect(charmander.name).toBe('Charmander');
+        expect(charmander.hitPoints).toBe(100);
+        expect(charmander.attackDamage).toBe(45);
+        expect(charmander.move).toBe('tackle');
+        expect(charmander.type).toBe('fire');
+    });
+
+    test('should correctly identify when a FireType is effective against a grass-type Pokemon', () => {
+        expect(charmander.isEffectiveAgainst(bulbasaur)).toBe(true);
+    });
+
+    test('should correctly identify when a FireType is not effective against a non-grass-type Pokemon', () => {
+        expect(charmander.isEffectiveAgainst(squirtle)).toBe(false);
+    });
+
+    test('should correctly inherit methods from Pokemon class', () => {
+        charmander.takeDamage(20);
+        expect(charmander.hitPoints).toBe(80);
+        
+        const consoleSpy = jest.spyOn(console, 'log');
+        charmander.useMove();
+        expect(consoleSpy).toHaveBeenCalledWith("Charmander used Charmander's move: tackle");
+        consoleSpy.mockRestore();
+
+        charmander.takeDamage(100);
+        expect(charmander.hasFainted()).toBe(true);
     });
 });
