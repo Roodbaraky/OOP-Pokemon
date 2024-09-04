@@ -60,3 +60,32 @@ export class ElectricType extends Pokemon {
         super(name, 'electric')
     }
 }
+export class Charmander extends FireType {
+    constructor(name: string) {
+        super(name)
+        this.move = 'ember'
+    }
+}
+export class Squirtle extends WaterType {
+    constructor(name: string) {
+        super(name)
+        this.move = 'water gun'
+    }
+}
+export class Bulbasaur extends GrassType {
+    constructor(name: string) {
+        super(name)
+        this.move = 'vine whip'
+    }
+}
+export class Pikachu extends ElectricType{
+    constructor(name:string){
+        super(name)
+        this.move = 'thunder bolt'
+    }
+}
+export class Rattata extends Pokemon{
+    constructor(name:string){
+        super(name)
+    }
+}
