@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokemon, Rattata, Squirtle, WaterType } from './pokemon';
+import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokeball, Pokemon, Rattata, Squirtle, WaterType } from './pokemon';
 
 describe('Pokemon Class', () => {
     let pikachu: Pokemon;
@@ -295,3 +295,64 @@ describe('Rattata Class', () => {
     });
 });
 
+describe('Pokeball Class', () => {
+    let pokeball: Pokeball;
+    let squirtle: Squirtle;
+    let bulbasaur: Bulbasaur;
+
+    beforeEach(() => {
+        pokeball = new Pokeball();
+        squirtle = new Squirtle('Squirtle');
+        bulbasaur = new Bulbasaur('Bulbasaur');
+    });
+    describe('isEmpty', () => {
+        it('should return true if empty', () => {
+            expect(pokeball.isEmpty()).toBe(true)
+        })
+        it('should return false if not empty', () => {
+            pokeball.throw(squirtle)
+            expect(pokeball.isEmpty()).toBe(false)
+        })
+    })
+    describe('contains', () => {
+        it('should return the stored pokemon\'s name if not empty', () => {
+            pokeball.throw(bulbasaur)
+            expect(pokeball.contains()).toBe('Bulbasaur')
+        })
+        it('should return \'Pokeball is empty!\' if no pokemon is stored',()=>{
+            expect(pokeball.contains()).toBe('The pokeball is empty!')
+        })
+    })
+    it('should capture a Pokemon if Pokeball is empty', () => {
+        pokeball.throw(squirtle);
+        expect(pokeball.storedPokemon).toBe(squirtle);
+        expect(pokeball.storedPokemon?.name).toBe('Squirtle');
+    });
+
+    it('should throw the stored Pokemon if no new Pokemon is passed and Pokeball is not empty', () => {
+        pokeball.throw(squirtle);
+        console.log = jest.fn();
+        pokeball.throw();
+        expect(console.log).toHaveBeenCalledWith('Go Squirtle');
+    });
+
+    it('should output that the Pokeball is empty when no Pokemon is stored and none is passed', () => {
+        console.log = jest.fn();
+        pokeball.throw();
+        expect(console.log).toHaveBeenCalledWith('The pokeball is empty!');
+    });
+
+    it('should not capture another Pokemon if one is already stored', () => {
+        pokeball.throw(squirtle);
+        console.log = jest.fn();
+        pokeball.throw(bulbasaur);
+        expect(pokeball.storedPokemon).toBe(squirtle);
+        expect(console.log).toHaveBeenCalledWith('This pokeball already contains Squirtle!');
+    });
+
+    it('should log capture message when capturing a Pokemon', () => {
+        console.log = jest.fn();
+        pokeball.throw(bulbasaur);
+        expect(console.log).toHaveBeenCalledWith('Captured Bulbasaur!');
+    });
+});

@@ -39,6 +39,36 @@ export class Pokemon {
     }
 }
 
+export class Pokeball {
+    storedPokemon?: Pokemon;
+    constructor() {
+    }
+
+    isEmpty() {
+        return this.storedPokemon === undefined
+    }
+    contains(){
+        return this.isEmpty()
+        ?`The pokeball is empty!`
+        :this.storedPokemon?.name
+    }
+    throw(pokemon?: Pokemon) {
+        if (pokemon && this.isEmpty()) {
+            console.log(`Captured ${pokemon.name}!`)
+            this.storedPokemon = pokemon
+        }
+        if (!pokemon && !this.isEmpty()) {
+            console.log(`Go ${this.storedPokemon?.name}`)
+        }
+        else {
+            console.log(`${this.isEmpty()
+                ?this.contains()
+            :'This pokeball already contains '+ this.contains()+'!'}`)
+        }
+    }
+
+}
+
 
 export class FireType extends Pokemon {
     constructor(name: string) {
@@ -78,14 +108,14 @@ export class Bulbasaur extends GrassType {
         this.move = 'vine whip'
     }
 }
-export class Pikachu extends ElectricType{
-    constructor(name:string){
+export class Pikachu extends ElectricType {
+    constructor(name: string) {
         super(name)
         this.move = 'thunder bolt'
     }
 }
-export class Rattata extends Pokemon{
-    constructor(name:string){
+export class Rattata extends Pokemon {
+    constructor(name: string) {
         super(name)
     }
 }
