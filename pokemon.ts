@@ -22,6 +22,7 @@ export class Pokemon {
     }
     takeDamage(damageAmount: number) {
         this.hitPoints -= damageAmount
+        if (this.hitPoints < 0) this.hitPoints = 0
     };
     useMove() {
         console.log(`${this.name} used ${this.name}'s move: ${this.move}`)
@@ -79,7 +80,6 @@ export class Trainer {
     }
     catch(pokemon: Pokemon) {
         const emptyPokeballs = this.belt.filter((pokeball: Pokeball) => pokeball.isEmpty())
-        console.log(emptyPokeballs)
         if (!emptyPokeballs.length) {
             console.log('No empty pokeballs!')
         }
@@ -91,6 +91,38 @@ export class Trainer {
         const foundPokemon = this.belt.find((pokeball) => pokeball.contains() === pokemon.name)
         if (!foundPokemon) console.log('You don\'t have that pokemon!')
         else foundPokemon.throw()
+    }
+}
+export interface TrainerAndPokemon {
+    trainer: Trainer
+    pokemon: Pokemon
+}
+
+export class Battle {
+    attacking: TrainerAndPokemon;
+    defending: TrainerAndPokemon;
+
+
+    constructor(battler1: TrainerAndPokemon, battler2: TrainerAndPokemon) {
+        this.attacking = battler1
+        this.defending = battler2
+    }
+    calculateDamage() {
+        let multiplier = 1
+        if (this.defending.pokemon.isWeakTo(this.attacking.pokemon)) multiplier = 1.25
+        if (this.defending.pokemon.isEffectiveAgainst(this.attacking.pokemon)) multiplier = 0.75
+        return multiplier * this.attacking.pokemon.attackDamage
+    }
+    switchTurns() {
+        [this.attacking, this.defending] = [this.defending, this.attacking];
+    }
+    fight() {
+        this.attacking.pokemon.useMove()
+        this.defending.pokemon.takeDamage(this.calculateDamage())
+        console.log(`...it was ${this.attacking.pokemon.isEffectiveAgainst(this.defending.pokemon) ? 'super effective' : 'not very effective'}!`)
+        if (this.defending.pokemon.hasFainted()) console.log(`${this.attacking.pokemon.name} KO\'d ${this.defending.pokemon.name}, ${this.attacking.trainer.name} wins!`)
+        this.switchTurns()
+
     }
 }
 

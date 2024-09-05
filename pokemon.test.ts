@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokeball, Pokemon, Rattata, Squirtle, Trainer, WaterType, PokeballProps } from './pokemon';
+import { Bulbasaur, Charmander, ElectricType, FireType, GrassType, Pikachu, Pokeball, Pokemon, Rattata, Squirtle, Trainer, WaterType, PokeballProps, Battle, TrainerAndPokemon } from './pokemon';
 
 describe('Pokemon Class', () => {
     let pikachu: Pokemon;
@@ -22,7 +22,7 @@ describe('Pokemon Class', () => {
 
     it('should not have negative hitPoints after taking more damage than available', () => {
         pikachu.takeDamage(150);
-        expect(pikachu.hitPoints).toBe(-50);
+        expect(pikachu.hitPoints).toBe(0);
     });
 
     it('should correctly determine if the Pokemon has fainted', () => {
@@ -402,7 +402,6 @@ describe('Trainer Class', () => {
         trainer.catch(squirtle);
         trainer.catch(bulbasaur);
         trainer.catch(pikachu);
-        console.log(trainer.belt)
         expect(trainer.belt[0].storedPokemon).toBe(squirtle);
         expect(trainer.belt[1].storedPokemon).toBe(bulbasaur);
         expect(trainer.belt[2].storedPokemon).toBe(pikachu);
@@ -417,3 +416,80 @@ describe('Trainer Class', () => {
         expect(console.log).toHaveBeenCalledWith(`Go ${pikachu.name}`);
     });
 });
+
+describe('Battle', () => {
+    let ash: Trainer
+    let gary: Trainer
+    let pikachu: Pikachu
+    let squirtle: Squirtle
+    let battler1: TrainerAndPokemon
+    let battler2: TrainerAndPokemon
+    let testBattle: Battle
+    beforeEach(() => {
+        ash = new Trainer('Ash')
+        gary = new Trainer('Gary')
+        pikachu = new Pikachu('Pikachu')
+        squirtle = new Squirtle('Squirtle')
+        battler1 = { trainer: ash, pokemon: pikachu }
+        battler2 = { trainer: gary, pokemon: squirtle }
+        testBattle = new Battle(battler1, battler2)
+    })
+
+    it('should alternate between pokemon', () => {
+        expect(testBattle.attacking.pokemon).toBe(pikachu)
+        testBattle.fight()
+        expect(testBattle.attacking.pokemon).toBe(squirtle)
+        testBattle.fight()
+        expect(testBattle.attacking.pokemon).toBe(pikachu)
+    })
+
+    it('should make the currentPokemon attack the other pokemon', () => {
+        pikachu.useMove = jest.fn()
+        squirtle.useMove = jest.fn()
+        testBattle.fight()
+        expect(pikachu.useMove).toBeCalledTimes(1)
+        testBattle.fight()
+        expect(squirtle.useMove).toBeCalledTimes(1)
+    })
+
+    it('should reduce the defending pokemon\'s hp on attack', () => {
+        testBattle.fight()
+        expect(squirtle.hitPoints < 100).toBe(true)
+    })
+
+    it('should apply an appropriate multiplier to attack damage when the attack is effectiveAgainst the defendingPokemon', () => {
+        testBattle.fight()
+        expect(squirtle.hitPoints).toBe(100 - (1.25 * pikachu.attackDamage))
+    })
+
+    it('should apply an appropriate multiplier to attack damage when the attack is not effectiveAgainst the defendingPokemon', () => {
+        testBattle.fight()
+        testBattle.fight()
+        expect(pikachu.hitPoints).toBe(100 - (squirtle.attackDamage * 0.75))
+    })
+
+    it('should log an attack message for each attack', () => {
+        console.log = jest.fn()
+        testBattle.fight()
+        expect(console.log).toHaveBeenNthCalledWith(1, "Pikachu used Pikachu's move: thunder bolt")
+        expect(console.log).toHaveBeenLastCalledWith('...it was super effective!')
+    })
+
+    it('should log an attack message for not very effective', () => {
+        console.log = jest.fn()
+        testBattle.fight()
+        testBattle.fight()
+        expect(console.log).toHaveBeenNthCalledWith(3, "Squirtle used Squirtle's move: water gun")
+        expect(console.log).toHaveBeenLastCalledWith('...it was not very effective!')
+    })
+
+    it('should log a victory / defeat message when one pokemon faints', () => {
+        console.log = jest.fn()
+        testBattle.fight()
+        testBattle.fight()
+        testBattle.fight()
+        expect(squirtle.hitPoints).toBe(0)
+        expect(console.log).toHaveBeenLastCalledWith('Pikachu KO\'d Squirtle, Ash wins!')
+    })
+
+})
